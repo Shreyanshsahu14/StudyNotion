@@ -31,7 +31,7 @@ function ReviewSlider() {
     },
     // Mobile view
     320: {
-      slidesPerView: 1,
+      slidesPerView: 2,
     },
   };
   useEffect(() => {
@@ -68,7 +68,7 @@ function ReviewSlider() {
           {reviews.map((review, i) => {
             return (
               <SwiperSlide key={i}>
-                <div className="flex flex-col gap-3 bg-richblack-800 p-3 text-[14px] text-richblack-25 min-h-[150px] ">
+                <div className="flex flex-col gap-3 md:w-[100%] w-[100%] bg-richblack-800 p-3 text-[14px] text-richblack-25 min-h-[150px] ">
                   <div className="flex items-center gap-4">
                     <img
                       src={
