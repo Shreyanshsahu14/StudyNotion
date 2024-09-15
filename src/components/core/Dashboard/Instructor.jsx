@@ -1,41 +1,40 @@
-import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
-import { Link } from "react-router-dom"
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { getInstructorData } from "../../../services/operations/profileAPI";
+import { fetchInstructorCourses } from "../../../services/operations/courseDetailsAPI";
+import { Link } from "react-router-dom";
+import InstructorChart from "../Dashboard/InstructorDashboard/InstructorChart";
 
-import { fetchInstructorCourses } from "../../../services/operations/courseDetailsAPI"
-import { getInstructorData } from "../../../services/operations/profileAPI"
-import InstructorChart from "./InstructorDashboard/InstructorChart"
-
-export default function Instructor() {
-  const { token } = useSelector((state) => state.auth)
-  const { user } = useSelector((state) => state.profile)
-  const [loading, setLoading] = useState(false)
-  const [instructorData, setInstructorData] = useState(null)
-  const [courses, setCourses] = useState([])
+const Instructor = () => {
+  const { token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.profile);
+  const [loading, setLoading] = useState(false);
+  const [instructorData, setInstructorData] = useState(null);
+  const [courses, setCourses] = useState([]);
 
   useEffect(() => {
-    ;(async () => {
-      setLoading(true)
-      const instructorApiData = await getInstructorData(token)
-      const result = await fetchInstructorCourses(token)
-      console.log(instructorApiData)
-      if (instructorApiData.length) setInstructorData(instructorApiData)
+    const getCourseDataWithStats = async () => {
+      setLoading(true);
+      const instructorApiData = await getInstructorData(token);
+      const result = await fetchInstructorCourses(token);
+      if (instructorApiData.length) setInstructorData(instructorApiData);
       if (result) {
-        setCourses(result)
+        setCourses(result);
       }
-      setLoading(false)
-    })()
-  }, [])
+      setLoading(false);
+    };
+    getCourseDataWithStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const totalAmount = instructorData?.reduce(
     (acc, curr) => acc + curr.totalAmountGenerated,
     0
-  )
-
+  );
   const totalStudents = instructorData?.reduce(
     (acc, curr) => acc + curr.totalStudentsEnrolled,
     0
-  )
+  );
 
   return (
     <div>
@@ -51,7 +50,7 @@ export default function Instructor() {
         <div className="spinner"></div>
       ) : courses.length > 0 ? (
         <div>
-          <div className="my-4 flex h-[450px] space-x-4">
+          <div className="my-4 flex md:flex-row flex-col md:h-[450px] md:space-x-4">
             {/* Render chart / graph */}
             {totalAmount > 0 || totalStudents > 0 ? (
               <InstructorChart courses={instructorData} />
@@ -64,7 +63,7 @@ export default function Instructor() {
               </div>
             )}
             {/* Total Statistics */}
-            <div className="flex min-w-[250px] flex-col rounded-md bg-richblack-800 p-6">
+            <div className="flex max-md:mt-4 min-w-[250px] flex-col rounded-md bg-richblack-800 p-6">
               <p className="text-lg font-bold text-richblack-5">Statistics</p>
               <div className="mt-4 space-y-4">
                 <div>
@@ -76,13 +75,13 @@ export default function Instructor() {
                 <div>
                   <p className="text-lg text-richblack-200">Total Students</p>
                   <p className="text-3xl font-semibold text-richblack-50">
-                    {totalStudents}
+                    {totalStudents ? totalStudents : 0}
                   </p>
                 </div>
                 <div>
                   <p className="text-lg text-richblack-200">Total Income</p>
                   <p className="text-3xl font-semibold text-richblack-50">
-                    Rs. {totalAmount}
+                    Rs. {totalAmount ? totalAmount : 0}
                   </p>
                 </div>
               </div>
@@ -96,9 +95,9 @@ export default function Instructor() {
                 <p className="text-xs font-semibold text-yellow-50">View All</p>
               </Link>
             </div>
-            <div className="my-4 flex items-start space-x-6">
+            <div className="my-4 flex md:flex-row flex-col items-start md:space-x-6 max-md:gap-4">
               {courses.slice(0, 3).map((course) => (
-                <div key={course._id} className="w-1/3">
+                <div key={course._id} className="md:w-1/3">
                   <img
                     src={course.thumbnail}
                     alt={course.courseName}
@@ -110,7 +109,7 @@ export default function Instructor() {
                     </p>
                     <div className="mt-1 flex items-center space-x-2">
                       <p className="text-xs font-medium text-richblack-300">
-                        {course.studentsEnroled.length} students
+                        {course.studentsEnroled?.length} students
                       </p>
                       <p className="text-xs font-medium text-richblack-300">
                         |
@@ -138,5 +137,7 @@ export default function Instructor() {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
+
+export default Instructor;
